@@ -1,3 +1,7 @@
+// This file is part of miniscript.
+// The content is subject to the terms of the MIT license.
+// Copyright (c) 2023-present Lukas Neubert.
+
 //=== Tokenizer ===//
 
 let TokenKind = {

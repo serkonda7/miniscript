@@ -1,12 +1,16 @@
+// This file is part of miniscript.
+// The content is subject to the terms of the MIT license.
+// Copyright (c) 2023-present Lukas Neubert.
+
 const fs = require('fs')
 const vm = require('vm')
-const prebuild = require('./bin/prebuild.js')
+const bootstrap = require('./bin/bootstrap.js')
 
 let res = ''
 
 try {
-	const text = fs.readFileSync('miniscript.ms', 'utf-8')
-	res = prebuild.compile(text)
+	const text = fs.readFileSync('src/miniscript.ms', 'utf-8')
+	res = bootstrap.compile(text)
 	const context = {
 		module: {exports: {}}
 	}
@@ -17,5 +21,5 @@ try {
 	return
 }
 
-fs.writeFileSync('bin/prebuild.js', res, 'utf-8')
+fs.writeFileSync('bin/bootstrap.js', res, 'utf-8')
 console.log("Successfully recompiled")
