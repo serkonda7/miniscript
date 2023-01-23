@@ -525,7 +525,6 @@ function p_if_stmt(){
 		consequent: null
 	}
 	if (p_tok.kind != TokenKind.key_if){
-		p_next()
 		scope_push(node)
 		node.consequent = p_parse_if_body()
 		scope_pop()
