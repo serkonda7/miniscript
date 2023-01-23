@@ -5,7 +5,7 @@ const prebuild = require('./bin/prebuild.js')
 let res = ''
 
 try {
-	const text = fs.readFileSync('miniscript.js', 'utf-8')
+	const text = fs.readFileSync('miniscript.ms', 'utf-8')
 	res = prebuild.compile(text)
 	const context = {
 		module: {exports: {}}
