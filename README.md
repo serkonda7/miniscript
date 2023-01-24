@@ -5,7 +5,11 @@ The prebuilt JS used for bootstrapping is in `bin/`.
 
 ## Usage
 ```sh
-node build.js
+Usage: node cli.js <command>
+
+Commands:
+	self   Recompile the compiler.
+	help   Show this message.
 ```
 
 ## License and Attribution
