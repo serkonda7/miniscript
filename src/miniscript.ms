@@ -35,6 +35,9 @@ let TokenKind = {
 	key_let: 'key_let',
 	key_function: 'key_function',
 	key_export: 'key_export',
+	key_import: 'key_import',
+	key_as: 'key_as',
+	key_from: 'key_from',
 	key_if: 'key_if',
 	key_else: 'key_else',
 	key_while: 'key_while',
@@ -50,6 +53,9 @@ let keyword_kinds = {
 	'let': TokenKind.key_let,
 	'function': TokenKind.key_function,
 	'export': TokenKind.key_export,
+	'import': TokenKind.key_import,
+	'as': TokenKind.key_as,
+	'from': TokenKind.key_from,
 	'if': TokenKind.key_if,
 	'else': TokenKind.key_else,
 	'while': TokenKind.key_while,
@@ -352,6 +358,7 @@ let NodeKind = {
 	continue: 'continue',
 	while_stmt: 'while_stmt',
 	export_stmt: 'export_stmt',
+	import_stmt: 'import_stmt',
 	function_decl: 'function_decl',
 	member_expr: 'member_expr',
 	comp_member_expr: 'comp_member_expr',
@@ -430,6 +437,9 @@ function p_parse_stmt(){
 	}
 	if (p_tok.kind == TokenKind.key_export){
 		return p_export()
+	}
+	if (p_tok.kind == TokenKind.key_import){
+		return p_import()
 	}
 	let node = p_parse_expr()
 	if (node == null) {
@@ -563,6 +573,21 @@ function p_export(){
 	} else {
 		console.error('Cannot export ' + p_tok.kind)
 	}
+	return node
+}
+
+function p_import(){
+	p_check(TokenKind.key_import)
+	p_check(TokenKind.mul)
+	p_check(TokenKind.key_as)
+	let node = {
+		kind: NodeKind.import_stmt,
+		ident: null,
+		mod_name: null
+	}
+	node.ident = p_parse_literal()
+	p_check(TokenKind.key_from)
+	node.mod_name = p_parse_literal()
 	return node
 }
 
@@ -995,6 +1020,11 @@ function g_generate_node(node){
 		} else {
 			console.error('cannot export node ' + init.kind)
 		}
+	} else if (kind == NodeKind.import_stmt){
+		g_write('import * as ')
+		g_generate_node(node.ident)
+		g_write(' from ')
+		g_generate_node(node.mod_name)
 	} else {
 		console.error('Unknown node kind ' + kind)
 	}

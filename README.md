@@ -13,7 +13,7 @@ Examples:
 Commands:
 	self      Recompile the compiler.
 	version   Print version information..
-	help      Show this message.`
+	help      Show this message.
 ```
 
 ## License and Attribution
