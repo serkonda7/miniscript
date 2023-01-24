@@ -316,46 +316,6 @@ function t_tokenize(text){
 	return tokens
 }
 
-
-//=== Scope ===//
-
-let scope = null
-
-function Scope(){
-	this.node = null
-	this.parent = null
-	this.symbols = {}
-
-	this.resolve = function(ident){
-		if (this.symbols[ident]){
-			return this.symbols[ident]
-		}
-		if(this.parent){
-			return this.parent.resolve(ident)
-		}
-		return null
-	}
-
-	this.register = function(ident, node){
-		this.symbols[ident] = node
-	}
-}
-
-function scope_push(node){
-	let s = new Scope()
-	s.node = node
-	s.parent = scope
-	node.context = s
-	scope = s
-}
-
-function scope_pop(){
-	if (scope != null){
-		scope = scope.parent
-	}
-}
-
-
 //=== Parser ===//
 
 let NodeKind = {
@@ -392,7 +352,6 @@ function p_parse(tokens){
 		kind: NodeKind.file,
 		body: null
 	}
-	scope_push(file)
 	file.body = p_parse_stmt_list()
 	return file
 }
@@ -472,7 +431,6 @@ function p_variable_decl(){
 		init: null
 	}
 	p_check(TokenKind.assign)
-	scope.register(name, node)
 	node.init = p_parse_expr()
 	return node
 }
@@ -487,14 +445,11 @@ function p_function_decl(){
 	}
 	if (p_tok.kind == TokenKind.name){
 		node.name = p_tok.val
-		scope.register(node.name, node)
 		p_next()
 	}
 	node.params = p_function_params()
 	p_check(TokenKind.lcur)
-	scope_push(node)
 	node.body = p_parse_stmt_list()
-	scope_pop()
 	p_check(TokenKind.rcur)
 	return node
 }
@@ -508,7 +463,6 @@ function p_function_params(){
 		}
 		let name = p_check_name()
 		params.push(name)
-		scope.register(name, name)
 		if(p_tok.kind != TokenKind.comma){
 			break
 		}
@@ -535,18 +489,14 @@ function p_if_stmt(){
 		consequent: null
 	}
 	if (p_tok.kind != TokenKind.key_if){
-		scope_push(node)
 		node.consequent = p_parse_if_body()
-		scope_pop()
 		return node
 	}
 	p_next()
 	p_check(TokenKind.lpar)
 	node.condition = p_parse_expr()
 	p_check(TokenKind.rpar)
-	scope_push(node)
 	node.consequent = p_parse_if_body()
-	scope_pop()
 	if (p_tok.kind == TokenKind.key_else){
 		p_next()
 		node.alternate = p_if_stmt()
@@ -570,9 +520,7 @@ function p_while_stmt(){
 	p_check(TokenKind.key_while)
 	node.condition = p_parse_expr()
 	p_check(TokenKind.lcur)
-	scope_push(node)
 	node.body = p_parse_stmt_list()
-	scope_pop()
 	p_check(TokenKind.rcur)
 	return node
 }
@@ -903,7 +851,6 @@ function g_generate_node(node){
 		}
 		g_write('(')
 		let i = 0
-		scope_push(node)
 		while(i < node.params.length){
 			g_write(node.params[i])
 			if(i + 1 < node.params.length){
@@ -914,7 +861,6 @@ function g_generate_node(node){
 		g_writeln(') {')
 		g_generate_body(node.body)
 		g_writeln('}')
-		scope_pop()
 	} else if (kind == NodeKind.var_decl){
 		g_write('let ')
 		g_write(node.name)
@@ -927,15 +873,11 @@ function g_generate_node(node){
 			g_write(')')
 		}
 		g_writeln('{')
-		scope_push(node.consequent)
 		g_generate_body(node.consequent)
-		scope_pop()
 		g_write('}')
 		if (node.alternate){
 			g_write(' else ')
-			scope_push(node.alternate)
 			g_generate_node(node.alternate)
-			scope_pop()
 		}
 	} else if (kind == NodeKind.return_stmt){
 		g_write('return ')
@@ -944,10 +886,8 @@ function g_generate_node(node){
 		g_write('while (')
 		g_generate_node(node.condition)
 		g_writeln(') {')
-		scope_push(node)
 		g_generate_body(node.body)
 		g_write('}')
-		scope_pop()
 	} else if (kind == NodeKind.break){
 		g_write('break')
 	} else if (kind == NodeKind.continue){
