@@ -6,11 +6,13 @@ const fs = require('fs')
 const vm = require('vm')
 const bootstrap = require('./bin/miniscript.js')
 
+let version = "1.1.0-dev"
 let help_text = `Usage: node cli.js <command>
 
 Commands:
-	self   Recompile the compiler.
-	help   Show this message.`
+	self      Recompile the compiler.
+	version   Print version information..
+	help      Show this message.`
 
 function recompile_self(){
 	let res = ''
@@ -36,6 +38,8 @@ function main() {
 	const args = process.argv.slice(2)
 	if (args.length == 0 || args[0] == 'help') {
 		console.log(help_text)
+	} else if (args[0] == 'version') {
+		console.log(version)
 	} else if (args[0] == 'self') {
 		recompile_self()
 	} else {
