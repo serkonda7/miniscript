@@ -1,7 +1,6 @@
 let TokenKind = {
 	eof: "eof",
 	name: "name",
-	null: "null",
 	string: "string",
 	number: "number",
 	lpar: "(",
@@ -37,8 +36,30 @@ let TokenKind = {
 	key_continue: "key_continue",
 	key_return: "key_return",
 	key_new: "key_new",
-	key_in: "key_in"
+	key_in: "key_in",
+	key_null: "key_null"
 }
+let keyword_kinds = {
+	"let": TokenKind.key_let,
+	"function": TokenKind.key_function,
+	"export": TokenKind.key_export,
+	"if": TokenKind.key_if,
+	"else": TokenKind.key_else,
+	"while": TokenKind.key_while,
+	"break": TokenKind.key_break,
+	"continue": TokenKind.key_continue,
+	"return": TokenKind.key_return,
+	"new": TokenKind.key_new,
+	"in": TokenKind.key_in,
+	"null": TokenKind.key_null
+}
+function t_get_keyword_kind(name) {
+	if (name in keyword_kinds){
+		return keyword_kinds[name]
+	}
+	return TokenKind.name
+}
+
 function t_is_whitespace(char) {
 	return char == " "
 }
@@ -57,46 +78,6 @@ function t_is_name_char(char) {
 
 function t_is_quote(char) {
 	return char == "'" || char == "\""
-}
-
-function t_get_keyword_kind(name) {
-	if (name == "let"){
-		return TokenKind.key_let
-	}
-	if (name == "function"){
-		return TokenKind.key_function
-	}
-	if (name == "export"){
-		return TokenKind.key_export
-	}
-	if (name == "if"){
-		return TokenKind.key_if
-	}
-	if (name == "else"){
-		return TokenKind.key_else
-	}
-	if (name == "while"){
-		return TokenKind.key_while
-	}
-	if (name == "break"){
-		return TokenKind.key_break
-	}
-	if (name == "continue"){
-		return TokenKind.key_continue
-	}
-	if (name == "return"){
-		return TokenKind.key_return
-	}
-	if (name == "new"){
-		return TokenKind.key_new
-	}
-	if (name == "in"){
-		return TokenKind.key_in
-	}
-	if (name == "null"){
-		return TokenKind.null
-	}
-	return TokenKind.name
 }
 
 function t_tokenize(text) {
@@ -597,7 +578,7 @@ function p_continue_expr() {
 }
 
 function p_is_literal(kind) {
-	return kind == TokenKind.string || kind == TokenKind.number || kind == TokenKind.name || kind == TokenKind.null
+	return kind == TokenKind.string || kind == TokenKind.number || kind == TokenKind.name || kind == TokenKind.key_null
 }
 
 function p_is_prefix_op(kind) {
