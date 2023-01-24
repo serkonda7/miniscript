@@ -1010,7 +1010,7 @@ function g_generate_node(node){
 
 //=== Exports ===//
 
-module.exports.compile = function compile(text){
+export function compile(text){
 	let tokens = t_tokenize(text)
 	const ast = p_parse(tokens)
 	return g_gen(ast)
