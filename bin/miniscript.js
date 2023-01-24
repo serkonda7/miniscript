@@ -36,7 +36,8 @@ let TokenKind = {
 	key_break: "key_break",
 	key_continue: "key_continue",
 	key_return: "key_return",
-	key_new: "key_new"
+	key_new: "key_new",
+	key_in: "key_in"
 }
 function t_is_whitespace(char) {
 	return char == " "
@@ -88,6 +89,9 @@ function t_get_keyword_kind(name) {
 	}
 	if (name == "new"){
 		return TokenKind.key_new
+	}
+	if (name == "in"){
+		return TokenKind.key_in
 	}
 	if (name == "null"){
 		return TokenKind.null
@@ -695,7 +699,7 @@ function p_parse_prefix_expr() {
 }
 
 function p_is_binary_operator(kind) {
-	return kind == TokenKind.assign || kind == TokenKind.plus || kind == TokenKind.minus || kind == TokenKind.mul || kind == TokenKind.div || kind == TokenKind.or || kind == TokenKind.and || kind == TokenKind.lt || kind == TokenKind.le || kind == TokenKind.gt || kind == TokenKind.ge || kind == TokenKind.eq || kind == TokenKind.ne
+	return kind == TokenKind.assign || kind == TokenKind.plus || kind == TokenKind.minus || kind == TokenKind.mul || kind == TokenKind.div || kind == TokenKind.or || kind == TokenKind.and || kind == TokenKind.lt || kind == TokenKind.le || kind == TokenKind.gt || kind == TokenKind.ge || kind == TokenKind.eq || kind == TokenKind.ne || kind == TokenKind.key_in
 }
 
 function p_parse_binary_expr(left) {
@@ -797,6 +801,13 @@ function g_writeln(str) {
 	g_emptyline = 1
 }
 
+function g_op_str(kind) {
+	if (kind == TokenKind.key_in){
+		return "in"
+	}
+	return kind
+}
+
 function g_gen(node) {
 	g_out = ""
 	g_generate_body(node.body)
@@ -887,7 +898,7 @@ function g_generate_node(node) {
 	} else if (kind == NodeKind.binary_expr){
 		g_generate_node(node.left)
 		g_write(" ")
-		g_write(node.op)
+		g_write(g_op_str(node.op))
 		g_write(" ")
 		g_generate_node(node.right)
 	} else if (kind == NodeKind.member_expr){
