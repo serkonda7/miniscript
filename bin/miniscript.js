@@ -546,8 +546,10 @@ function p_export() {
 		kind: NodeKind.export_stmt,
 		init: null
 	}
-	if (p_tok.kind == TokenKind.key_let || p_tok == TokenKind.key_function){
-		init = p_parse_stmt()
+	if (p_tok.kind == TokenKind.key_let || p_tok.kind == TokenKind.key_function){
+		node.init = p_parse_stmt()
+	} else {
+		console.error("Cannot export " + p_tok.kind)
 	}
 	return node
 }
