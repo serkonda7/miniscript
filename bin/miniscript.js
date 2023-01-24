@@ -2,6 +2,7 @@ let TokenKind = {
 	eof: "eof",
 	name: "name",
 	string: "string",
+	tmpl_string: "tmpl_string",
 	number: "number",
 	lpar: "(",
 	rpar: ")",
@@ -167,6 +168,19 @@ function t_tokenize(text) {
 			}
 			let val = text.slice(start + 1, i)
 			push_token(TokenKind.string, val)
+			continue
+		}
+		if (char == "`"){
+			let start = i
+			while (1) {
+				next()
+				char = text.charAt(i)
+				if (char == "`"){
+					break
+				}
+			}
+			let val = text.slice(start + 1, i)
+			push_token(TokenKind.tmpl_string, val)
 			continue
 		}
 		if (char == "/"){
@@ -603,7 +617,7 @@ function p_continue_expr() {
 }
 
 function p_is_literal(kind) {
-	return kind == TokenKind.string || kind == TokenKind.number || kind == TokenKind.name || kind == TokenKind.key_null
+	return kind == TokenKind.string || kind == TokenKind.tmpl_string || kind == TokenKind.number || kind == TokenKind.name || kind == TokenKind.key_null
 }
 
 function p_is_prefix_op(kind) {
@@ -958,6 +972,10 @@ function g_generate_node(node) {
 			g_write("\"")
 			g_write(node.val.replace("\"", "\\\""))
 			g_write("\"")
+		} else if (node.lit_kind == TokenKind.tmpl_string){
+			g_write("`")
+			g_write(node.val)
+			g_write("`")
 		} else {
 			g_write(node.val)
 		}
