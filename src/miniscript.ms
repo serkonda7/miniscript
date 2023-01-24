@@ -1021,10 +1021,11 @@ function g_generate_node(node){
 			console.error('cannot export node ' + init.kind)
 		}
 	} else if (kind == NodeKind.import_stmt){
-		g_write('import * as ')
+		g_write('const ')
 		g_generate_node(node.ident)
-		g_write(' from ')
+		g_write(' = require(')
 		g_generate_node(node.mod_name)
+		g_write(')')
 	} else {
 		console.error('Unknown node kind ' + kind)
 	}
