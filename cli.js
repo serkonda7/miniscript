@@ -7,7 +7,10 @@ const vm = require('vm')
 const bootstrap = require('./bin/miniscript.js')
 
 let version = "1.1.0-dev"
-let help_text = `Usage: node cli.js <command>
+let help_text = `Usage: node cli.js <command|file>
+
+Examples:
+   node cli.js foo.ms   Compile the file ´foo.ms´ into ´foo.js´.
 
 Commands:
 	self      Recompile the compiler.
@@ -34,6 +37,13 @@ function recompile_self(){
 	console.log("Successfully recompiled")
 }
 
+function compile_file(path){
+	const text = fs.readFileSync(path, 'utf-8')
+	const res = bootstrap.compile(text)
+	const out_name = path.replace('.ms', '.js')
+	fs.writeFileSync(out_name, res, 'utf-8')
+}
+
 function main() {
 	const args = process.argv.slice(2)
 	if (args.length == 0 || args[0] == 'help') {
@@ -42,6 +52,8 @@ function main() {
 		console.log(version)
 	} else if (args[0] == 'self') {
 		recompile_self()
+	} else if (fs.existsSync(args[0])) {
+		compile_file(args[0])
 	} else {
 		console.error('Unknown command ' + args[0])
 	}

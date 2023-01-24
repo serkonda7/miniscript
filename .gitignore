@@ -1,0 +1,3 @@
+*.js
+!cli.js
+!bin/miniscript.js
