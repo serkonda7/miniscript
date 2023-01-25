@@ -16,6 +16,25 @@ Commands:
 	help      Show this message.
 ```
 
+## Feature Support and Compability
+> This section is work in progress and doesn't reflect the actual feature set yet!
+
+### Try...catch
+```js
+try {
+	// try statements
+} catch (exception_var) {
+	// catch statements
+} finally {
+	// finally statements
+}
+```
+
+Optional elements:
+- `exception_var` and its surrounding parentheses, resulting in `catch {...}`
+- `catch` block
+- `finally` block
+
 ## License and Attribution
 This project was inspired by [mini-js][repo-mini-js].
 

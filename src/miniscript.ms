@@ -48,6 +48,9 @@ let TokenKind = {
 	key_new: 'key_new',
 	key_in: 'key_in',
 	key_null: 'key_null',
+	key_try: 'key_try',
+	key_catch: 'key_catch',
+	key_finally: 'key_finally',
 }
 
 let keyword_kinds = {
@@ -66,6 +69,9 @@ let keyword_kinds = {
 	'new': TokenKind.key_new,
 	'in': TokenKind.key_in,
 	'null': TokenKind.key_null,
+	'try': TokenKind.key_try,
+	'catch': TokenKind.key_catch,
+	'finally': TokenKind.key_finally,
 }
 
 function t_get_keyword_kind(name){
@@ -338,6 +344,7 @@ let NodeKind = {
 	member_expr: 'member_expr',
 	comp_member_expr: 'comp_member_expr',
 	call_expr: 'call_expr',
+	try_catch: 'try_catch',
 }
 
 let p_idx = 0
@@ -414,6 +421,9 @@ function p_parse_stmt(){
 	}
 	if (p_tok.kind == TokenKind.key_import){
 		return p_import()
+	}
+	if (p_tok.kind == TokenKind.key_try){
+		return p_try_catch()
 	}
 	let node = p_parse_expr()
 	if (node == null) {
@@ -551,6 +561,38 @@ function p_import(){
 	node.ident = p_parse_literal()
 	p_check(TokenKind.key_from)
 	node.mod_name = p_parse_literal()
+	return node
+}
+
+function p_try_catch(){
+	p_check(TokenKind.key_try)
+	p_check(TokenKind.lcur)
+	let node = {
+		kind: NodeKind.try_catch,
+		try_body: null,
+		exception_var: null,
+		catch_body: null,
+		finally_body: null,
+	}
+	node.try_body = p_parse_stmt_list()
+	p_check(TokenKind.rcur)
+	if (p_tok.kind == TokenKind.key_catch) {
+		p_next()
+		if (p_tok.kind == TokenKind.lpar){
+			p_next()
+			node.exception_var = p_parse_literal()
+			p_check(TokenKind.rpar)
+		}
+		p_check(TokenKind.lcur)
+		node.catch_body = p_parse_stmt_list()
+		p_check(TokenKind.rcur)
+	}
+	if (p_tok.kind == TokenKind.key_finally) {
+		p_next()
+		p_check(TokenKind.lcur)
+		node.finally_body = p_parse_stmt_list()
+		p_check(TokenKind.rcur)
+	}
 	return node
 }
 
@@ -986,6 +1028,26 @@ function g_generate_node(node){
 		g_write(' = require(')
 		g_generate_node(node.mod_name)
 		g_write(')')
+	} else if (kind == NodeKind.try_catch){
+		g_writeln('try {')
+		g_generate_body(node.try_body)
+		g_write('}')
+		if (node.catch_body) {
+			g_write(' catch ')
+			if (node.exception_var) {
+				g_write('(')
+				g_generate_node(node.exception_var)
+				g_write(')')
+			}
+			g_writeln('{')
+			g_generate_body(node.catch_body)
+			g_write('}')
+		}
+		if (node.finally_body) {
+			g_writeln(' finally { ')
+			g_generate_body(node.finally_body)
+			g_write('}')
+		}
 	} else {
 		console.error('Unknown node kind ' + kind)
 	}
