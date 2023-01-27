@@ -923,7 +923,9 @@ function g_generate_node(node){
 		}
 	} else if (kind == NodeKind.return_stmt){
 		g_write('return ')
-		g_generate_node(node.expr)
+		if (node.expr) {
+			g_generate_node(node.expr)
+		}
 	} else if (kind == NodeKind.while_stmt){
 		g_write('while (')
 		g_generate_node(node.condition)
