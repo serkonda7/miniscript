@@ -4,7 +4,7 @@
 
 const fs = require('fs')
 const vm = require('vm')
-const bootstrap = require('./bin/miniscript.js')
+const miniscript = require('./out/miniscript.js')
 
 let version = "1.1.0-dev"
 let help_text = `Usage: node cli.js <command|file>
@@ -22,7 +22,7 @@ function recompile_self(){
 
 	try {
 		const text = fs.readFileSync('src/miniscript.ms', 'utf-8')
-		res = bootstrap.compile(text)
+		res = miniscript.compile(text)
 		const context = {
 			module: {exports: {}}
 		}
@@ -33,13 +33,13 @@ function recompile_self(){
 		return
 	}
 
-	fs.writeFileSync('bin/miniscript.js', res, 'utf-8')
+	fs.writeFileSync('out/miniscript.js', res, 'utf-8')
 	console.log("Successfully recompiled")
 }
 
 function compile_file(path){
 	const text = fs.readFileSync(path, 'utf-8')
-	const res = bootstrap.compile(text)
+	const res = miniscript.compile(text)
 	const out_name = path.replace('.ms', '.js')
 	fs.writeFileSync(out_name, res, 'utf-8')
 }

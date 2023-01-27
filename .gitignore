@@ -1,3 +1,3 @@
 *.js
 !cli.js
-!bin/miniscript.js
+!out/miniscript.js
