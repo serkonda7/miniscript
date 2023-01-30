@@ -30,6 +30,13 @@ try {
 }
 ```
 
+### Imports and Exports
+```js
+import * as import_name from 'import'
+
+export { foo, bar, baz }
+```
+
 Optional elements:
 - `exception_var` and its surrounding parentheses, resulting in `catch {...}`
 - `catch` block

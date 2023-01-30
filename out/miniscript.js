@@ -515,12 +515,9 @@ function p_export() {
 	p_check(TokenKind.key_export)
 	let node = {
 		kind: NodeKind.export_stmt,
-		init: null,
 		idents: []
 	}
-	if (p_tok.kind == TokenKind.key_function){
-		node.init = p_parse_stmt()
-	} else if (p_tok.kind == TokenKind.lcur){
+	if (p_tok.kind == TokenKind.lcur){
 		p_next()
 		while (p_tok.kind != TokenKind.rcur) {
 			node.idents.push(p_parse_literal())
@@ -978,24 +975,17 @@ function g_generate_node(node) {
 			g_write(node.val)
 		}
 	} else if (kind == NodeKind.export_stmt){
-		if (node.init && node.init.kind == NodeKind.function_decl){
-			g_write("module.exports.")
-			g_write(node.init.name)
-			g_write(" = ")
-			g_generate_node(node.init)
-		} else {
-			g_write("module.exports = {")
-			let i = 0
-			while (i < node.idents.length) {
-				let el = node.idents[i]
-				g_generate_node(el)
-				if (i + 1 < node.idents.length){
-					g_write(", ")
-				}
-				i = i + 1
+		g_write("module.exports = {")
+		let i = 0
+		while (i < node.idents.length) {
+			let el = node.idents[i]
+			g_generate_node(el)
+			if (i + 1 < node.idents.length){
+				g_write(", ")
 			}
-			g_write("}")
+			i = i + 1
 		}
+		g_write("}")
 	} else if (kind == NodeKind.import_stmt){
 		g_write("const ")
 		g_generate_node(node.ident)
@@ -1027,10 +1017,11 @@ function g_generate_node(node) {
 	}
 }
 
-module.exports.compile = function compile(text) {
+function compile(text) {
 	let tokens = t_tokenize(text)
 	const
 	ast = p_parse(tokens)
 	return g_gen(ast)
 }
 
+module.exports = {compile}
