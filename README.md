@@ -1,5 +1,5 @@
 # Miniscript
-Selfhosted source-to-source compiler for a minimal superset of JavaScript in 1k lines of code.
+Selfhosted source-to-source compiler for a small superset of JavaScript in 1k lines of code.
 
 The prebuilt JS used for bootstrapping is in `out/`.
 

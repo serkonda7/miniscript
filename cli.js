@@ -6,7 +6,7 @@ const fs = require('fs')
 const vm = require('vm')
 const miniscript = require('./out/miniscript.js')
 
-let version = "1.1.0-dev"
+let version = "1.1.0"
 let help_text = `Usage: node cli.js <command|file>
 
 Examples:
