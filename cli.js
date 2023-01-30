@@ -46,16 +46,17 @@ function compile_file(path){
 
 function main() {
 	const args = process.argv.slice(2)
-	if (args.length == 0 || args[0] == 'help') {
+	const cmd = args[0]
+	if (args.length == 0 || cmd == 'help') {
 		console.log(help_text)
-	} else if (args[0] == 'version') {
+	} else if (cmd == 'version') {
 		console.log(version)
-	} else if (args[0] == 'self') {
+	} else if (cmd == 'self') {
 		recompile_self()
-	} else if (fs.existsSync(args[0])) {
-		compile_file(args[0])
+	} else if (fs.existsSync(cmd)) {
+		compile_file(cmd)
 	} else {
-		console.error('Unknown command ' + args[0])
+		console.error('Unknown command ' + cmd)
 	}
 }
 
