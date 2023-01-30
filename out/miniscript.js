@@ -515,10 +515,20 @@ function p_export() {
 	p_check(TokenKind.key_export)
 	let node = {
 		kind: NodeKind.export_stmt,
-		init: null
+		init: null,
+		idents: []
 	}
-	if (p_tok.kind == TokenKind.key_let || p_tok.kind == TokenKind.key_function){
+	if (p_tok.kind == TokenKind.key_function){
 		node.init = p_parse_stmt()
+	} else if (p_tok.kind == TokenKind.lcur){
+		p_next()
+		while (p_tok.kind != TokenKind.rcur) {
+			node.idents.push(p_parse_literal())
+			if (p_tok.kind == TokenKind.comma){
+				p_next()
+			}
+		}
+		p_next()
 	} else {
 		console.error("Cannot export " + p_tok.kind)
 	}
@@ -968,16 +978,23 @@ function g_generate_node(node) {
 			g_write(node.val)
 		}
 	} else if (kind == NodeKind.export_stmt){
-		let init = node.init
-		g_write("module.exports.")
-		g_write(init.name)
-		g_write(" = ")
-		if (init.kind == NodeKind.function_decl){
-			g_generate_node(init)
-		} else if (init.kind == NodeKind.var_decl){
-			g_generate_node(init.init)
+		if (node.init && node.init.kind == NodeKind.function_decl){
+			g_write("module.exports.")
+			g_write(node.init.name)
+			g_write(" = ")
+			g_generate_node(node.init)
 		} else {
-			console.error("cannot export node " + init.kind)
+			g_write("module.exports = {")
+			let i = 0
+			while (i < node.idents.length) {
+				let el = node.idents[i]
+				g_generate_node(el)
+				if (i + 1 < node.idents.length){
+					g_write(", ")
+				}
+				i = i + 1
+			}
+			g_write("}")
 		}
 	} else if (kind == NodeKind.import_stmt){
 		g_write("const ")
